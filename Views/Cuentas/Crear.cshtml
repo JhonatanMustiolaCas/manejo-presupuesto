@@ -1,0 +1,39 @@
+﻿@model CuentaViewModel
+
+@{
+	ViewData["Title"] = "Crear Cuenta";
+}
+
+<h1>Crear Cuenta</h1>
+<h5 class="text-secundary">Explicacion</h5>
+
+<form asp-action="Crear">
+	<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+	<div class="mb-3">
+		<label asp-for="Nombre" class="form-label"></label>
+		<input asp-for="Nombre" class="form-control"/>
+		<span class="text-danger" asp-validation-for="Nombre"></span>
+	</div>
+	<div class="mb-3">
+		<label asp-for="TipoCuentaId" class="form-label"></label>
+		<select asp-for="TipoCuentaId" asp-items="Model.TiposCuentas" class="form-select"></select>
+		<span asp-validation-for="TipoCuentaId" class="text-danger"></span>
+	</div>
+	<div class="mb-3">
+		<label asp-for="Balance" class="form-label"></label>
+		<input asp-for="Balance" class="form-control"/>
+		<span class="text-danger" asp-validation-for="Balance"></span>
+	</div>
+	<div class="mb-3">
+		<label asp-for="Descripcion" class="form-label"></label>
+		<textarea asp-for="Descripcion" class="form-control"></textarea>
+	</div>
+
+	<button type="submit" class="btn btn-primary">Crear</button>
+	<a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+}
