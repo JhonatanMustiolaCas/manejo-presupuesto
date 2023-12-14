@@ -2,6 +2,6 @@
 
 ## Tareas
 
-[ ] Agregar estilos
-[ ] Hacer Responsive
-[ ] Migrar base de datos a MySql
++ [ ] Agregar estilos
++ [ ] Hacer Responsive
++ [ ] Migrar base de datos a MySql
