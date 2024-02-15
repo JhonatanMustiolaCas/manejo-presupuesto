@@ -26,3 +26,9 @@ Gestiona tus finanzas de forma sencilla y accede a un completo stack de funciona
 * Vista de calendario
 * Ordenar cuentas con drag and drop
 * Reportes en excel
+
+## Demo
+
+<video width="320" height="240" autoplay controls>
+  <source src="./assets/demo.mp4" type="video/mp4">
+</video>
