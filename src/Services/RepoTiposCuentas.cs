@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using ManejoPresupuesto.Models;
 using Microsoft.Data.SqlClient;
+using MySql.Data.MySqlClient;
 
 namespace ManejoPresupuesto.Services
 {
@@ -15,7 +16,7 @@ namespace ManejoPresupuesto.Services
 		Task<IEnumerable<TipoCuenta>> ObtenerTiposCuentas(int usuarioId);
 		Task Ordenar(IEnumerable<TipoCuenta> tiposCuentasOrdenados);
 	}
-	public class RepoTiposCuentas: IRepoTiposCuentas
+	public class RepoTiposCuentas : IRepoTiposCuentas
 	{
 		private readonly string connectionString;
 		public RepoTiposCuentas(IConfiguration config)
@@ -25,10 +26,13 @@ namespace ManejoPresupuesto.Services
 		//Metodo para crear un nuevo tipo de cuenta en la base de datos
 		public async Task Crear(TipoCuenta tipoCuenta)
 		{
-			using var connection = new SqlConnection(connectionString);
+			using var connection = new MySqlConnection(connectionString);
 			var id = await connection.QuerySingleAsync<int>("TiposCuentas_Insertar",
-				new {usuarioId = tipoCuenta.UsuarioId,
-					nombre = tipoCuenta.Nombre},
+				new
+				{
+					_UsuarioId = tipoCuenta.UsuarioId,
+					_Nombre = tipoCuenta.Nombre
+				},
 				commandType: System.Data.CommandType.StoredProcedure);
 			tipoCuenta.Id = id;
 		}
@@ -36,13 +40,13 @@ namespace ManejoPresupuesto.Services
 		//en la base de datos. Si existe retorna true, si no false
 		public async Task<bool> Existe(string nombre, int usuarioId, int id = 0)
 		{
-			using var connection = new SqlConnection(connectionString);
+			using var connection = new MySqlConnection(connectionString);
 			var existe = await connection.QueryFirstOrDefaultAsync<int>
 				(@"
 				SELECT 1
 				FROM TiposCuentas
 				WHERE Nombre = @Nombre AND UsuarioId = @UsuarioId AND id <> @id",
-				new {nombre, usuarioId, id});
+				new { nombre, usuarioId, id });
 			return existe == 1;
 
 		}
@@ -50,7 +54,7 @@ namespace ManejoPresupuesto.Services
 		//mapeados desde la base de datos, segun los campos consultados
 		public async Task<IEnumerable<TipoCuenta>> ObtenerTiposCuentas(int usuarioId)
 		{
-			using var connection = new SqlConnection(connectionString);
+			using var connection = new MySqlConnection(connectionString);
 			return await connection.QueryAsync<TipoCuenta>
 				(@"
 				SELECT Id, Nombre, Orden
@@ -63,7 +67,7 @@ namespace ManejoPresupuesto.Services
 		//metodo que permite actualizar el campo Nombre de un tipo de cuenta en la base de datos
 		public async Task Actualizar(TipoCuenta tipoCuenta)
 		{
-			using var connection = new SqlConnection(connectionString);
+			using var connection = new MySqlConnection(connectionString);
 			await connection.ExecuteAsync
 				(@"
 				UPDATE TiposCuentas
@@ -75,31 +79,31 @@ namespace ManejoPresupuesto.Services
 		//metodo que permite borrar un registro de tipo de cuenta segun su id
 		public async Task Borrar(int id)
 		{
-			using var connection = new SqlConnection(connectionString);
+			using var connection = new MySqlConnection(connectionString);
 			await connection.ExecuteAsync
 				(@"
-				DELETE TiposCuentas
+				DELETE FROM TiposCuentas
 				WHERE Id = @Id",
-				new {id});
+				new { id });
 		}
 
 		//metodo para obtener Id, Nombre y Orden de un tipo de cuenta por id de usuario, caso que exista
 		public async Task<TipoCuenta> ObtenerPorId(int id, int usuarioId)
 		{
-			using var connection = new SqlConnection(connectionString);
+			using var connection = new MySqlConnection(connectionString);
 			return await connection.QueryFirstOrDefaultAsync<TipoCuenta>
 				(@"
 				SELECT Id, Nombre, Orden
 				FROM TiposCuentas
 				WHERE Id = @Id AND UsuarioId = @UsuarioId",
-				new {id, usuarioId});
+				new { id, usuarioId });
 		}
 
 		//metodo para actualizar el Orden de un tipo de cuenta
 		public async Task Ordenar(IEnumerable<TipoCuenta> tiposCuentasOrdenados)
 		{
 			var query = "UPDATE TiposCuentas SET Orden = @Orden WHERE Id = @Id;";
-			using var connection = new SqlConnection(connectionString);
+			using var connection = new MySqlConnection(connectionString);
 			await connection.ExecuteAsync(query, tiposCuentasOrdenados);
 
 		}

@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using ManejoPresupuesto.Models;
 using Microsoft.Data.SqlClient;
+using MySql.Data.MySqlClient;
 
 namespace ManejoPresupuesto.Services
 {
@@ -18,20 +19,20 @@ namespace ManejoPresupuesto.Services
 		private readonly string connectionString;
 
 		public RepoCuenta(IConfiguration configuration)
-        {
+		{
 			this.connectionString = configuration.GetConnectionString("DefaultConnection");
 		}
 
 		public async Task Crear(Cuenta cuenta)
 		{
-			using var connection = new SqlConnection(connectionString);
+			using var connection = new MySqlConnection(connectionString);
 
 			var id = await connection.QuerySingleAsync<int>
 				(@"
 				INSERT INTO Cuentas (Nombre, TipoCuentaId, Descripcion, Balance)
-				VALUES (@Nombre, @TipoCuentaId, @Descripcion, @Balance)
+				VALUES (@Nombre, @TipoCuentaId, @Descripcion, @Balance);
 				
-				SELECT SCOPE_IDENTITY()",
+				SELECT LAST_INSERT_ID();",
 				cuenta);
 
 			cuenta.Id = id;
@@ -39,7 +40,7 @@ namespace ManejoPresupuesto.Services
 
 		public async Task<IEnumerable<Cuenta>> BuscarCuentas(int usuarioId)
 		{
-			using var connection = new SqlConnection(connectionString);
+			using var connection = new MySqlConnection(connectionString);
 			return await connection.QueryAsync<Cuenta>
 				(@"
 				SELECT Cuentas.id, Cuentas.Nombre, Balance, tc.Nombre AS TipoCuenta
@@ -48,12 +49,12 @@ namespace ManejoPresupuesto.Services
 				ON tc.id = TipoCuentaId
 				WHERE tc.UsuarioId = @UsuarioId
 				ORDER BY tc.Orden",
-				new {usuarioId});
+				new { usuarioId });
 		}
 
 		public async Task<Cuenta> ObtenerCuentaPorId(int id, int usuarioId)
 		{
-			using var connection = new SqlConnection(connectionString);
+			using var connection = new MySqlConnection(connectionString);
 			return await connection.QueryFirstOrDefaultAsync<Cuenta>
 				(@"
 				SELECT Cuentas.id, Cuentas.Nombre, Balance, Descripcion, TipoCuentaId
@@ -61,12 +62,12 @@ namespace ManejoPresupuesto.Services
 				INNER JOIN TiposCuentas tc
 				ON tc.id = TipoCuentaId
 				WHERE Cuentas.id = @id AND tc.UsuarioId = @UsuarioId",
-				new {id, usuarioId});
+				new { id, usuarioId });
 		}
 
 		public async Task Actualizar(CuentaViewModel cuenta)
 		{
-			using var connection = new SqlConnection(connectionString);
+			using var connection = new MySqlConnection(connectionString);
 			await connection.ExecuteAsync
 				(@"
 				UPDATE Cuentas
@@ -77,12 +78,12 @@ namespace ManejoPresupuesto.Services
 
 		public async Task BorrarCuenta(int id)
 		{
-			using var connection = new SqlConnection(connectionString);
+			using var connection = new MySqlConnection(connectionString);
 			await connection.ExecuteAsync
 				(@"
-				DELETE Cuentas
-				WHERE id = @id",
-				new {id});
+				DELETE FROM Cuentas
+				WHERE Id = @id",
+				new { id });
 		}
-    }
+	}
 }

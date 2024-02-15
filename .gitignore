@@ -1,2 +1,5 @@
 /bin
+/src/bin
 /obj
+/src/obj
+/src/appsettings.Development.json

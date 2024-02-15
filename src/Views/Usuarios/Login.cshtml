@@ -1,13 +1,13 @@
-﻿@model RegistroViewModel
+﻿@model LoginViewModel
 
 @{
-	ViewData["Title"] = "Registro";
+	ViewData["Title"] = "Login";
 }
 
-<h1>Regístrate</h1>
+<h2>Login</h2>
 
-<form asp-action="Registro">
-	<div class="contenedor-formulario">
+<form asp-action="Login">
+	<div class="contenedor-formulario shadow">
 		<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
 		<div class="mb-3">
@@ -20,10 +20,15 @@
 			<label asp-for="Password" class="form-label"></label>
 			<input asp-for="Password" class="form-control" />
 			<span asp-validation-for="Password" class="text-danger"></span>
-
-			<button class="btn btn-primary mt-3">Regístrate</button>
-			<a class="btn btn-success mt-3" asp-action="login">Acceder a cuenta existente</a>
 		</div>
+
+		<div class="form-check">
+			<input class="form-check-input" type="checkbox" asp-for="Recuerdame" />
+			<label class="form-check-label" asp-for="Recuerdame"></label>
+		</div>
+
+		<button class="btn btn-primary mt-3">Login</button>
+		<a class="btn btn-success mt-3" asp-action="Registro">Registrar nueva cuenta</a>
 	</div>
 </form>
 

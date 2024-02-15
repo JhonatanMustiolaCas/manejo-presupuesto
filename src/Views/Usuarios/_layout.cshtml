@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,25 +11,36 @@
     <link rel="stylesheet" href="~/ManejoPresupuesto.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/custom.css" asp-append-version="true" />
 </head>
-<body style="margin:0">
-    
-    <div class="d-flex justify-content-center align-items-center vh-100">
-        <div class="me-5">
-            <h1>
-                Manejo Presupuesto
+
+<body class="container-fluid position-relative">
+
+    <div class="d-md-flex justify-content-evenly vh-100 align-items-center mt-5 mt-md-0">
+        <div class="mb-5 mb-md-0 text-md-start text-center">
+            <img src="~/images/finance.png" class="img__decoracion" />
+            <h1 class="text-primary text-uppercase">
+                Gestor de Finanzas
             </h1>
-            <h4>En esta aplicación podrás manejar tus finanzas</h4>
+            <p class="slogan">Gestiona efectivamente tus finanzas. Visualiza tus trasacciones, balance y genera
+                reportes </p>
         </div>
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-   
+    <div style="overflow: hidden;position:absolute;bottom:0;left:0;width:100%;z-index:-1">
+        <svg preserveAspectRatio="none" viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg"
+            style="fill: #2193f1; width: 100%; height: 92px; transform: rotate(180deg);">
+            <path d="M1200 120L0 16.48V0h1200v120z" />
+        </svg>
+    </div>
+
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/jquery-ui/jquery-ui.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>

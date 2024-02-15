@@ -2,6 +2,7 @@
 using ManejoPresupuesto.Model;
 using ManejoPresupuesto.Models;
 using Microsoft.Data.SqlClient;
+using MySql.Data.MySqlClient;
 
 namespace ManejoPresupuesto.Services
 {
@@ -20,18 +21,18 @@ namespace ManejoPresupuesto.Services
 		private readonly string connectionString;
 
 		public RepoCategorias(IConfiguration configuration)
-        {
-            this.connectionString = configuration.GetConnectionString("DefaultConnection");
-        }
+		{
+			this.connectionString = configuration.GetConnectionString("DefaultConnection");
+		}
 
 		public async Task Crear(Categoria categoria)
 		{
-			using var connection = new SqlConnection(connectionString);
+			using var connection = new MySqlConnection(connectionString);
 			var id = await connection.QuerySingleAsync<int>
 				(@"
 				INSERT INTO Categorias (Nombre, TipoOperacionId, UsuarioId)
 				VALUES (@Nombre, @TipoOperacionId, @UsuarioId);
-				SELECT SCOPE_IDENTITY();",
+				SELECT LAST_INSERT_ID();",
 				categoria);
 
 			categoria.Id = id;
@@ -42,49 +43,48 @@ namespace ManejoPresupuesto.Services
 				int usuarioId,
 				PaginacionViewModel paginacionViewModel)
 		{
-			using var connection = new SqlConnection(connectionString);
+			using var connection = new MySqlConnection(connectionString);
 			return await connection.QueryAsync<Categoria>
 				(@$"
 				SELECT * FROM Categorias
 				WHERE UsuarioId = @UsuarioId
 				ORDER BY Nombre
-				OFFSET {paginacionViewModel.RecordsASaltar}
-				ROWS FETCH NEXT {paginacionViewModel.RecordsPorPagina}
-				ROWS ONLY",
-				new {usuarioId});
+				LIMIT {paginacionViewModel.RecordsPorPagina}
+				OFFSET {paginacionViewModel.RecordsASaltar}",
+				new { usuarioId });
 		}
 
 		public async Task<int> ContarCategorias(int usuarioId)
 		{
-			using var connection = new SqlConnection(connectionString);
+			using var connection = new MySqlConnection(connectionString);
 			return await connection.ExecuteScalarAsync<int>
-			("SELECT COUNT(*) FROM Categorias WHERE UsuarioId = @usuarioId", new {usuarioId});
+			("SELECT COUNT(*) FROM Categorias WHERE UsuarioId = @usuarioId", new { usuarioId });
 		}
 
-		public async Task<IEnumerable<Categoria>> 
+		public async Task<IEnumerable<Categoria>>
 			ObtenerCategorias(int usuarioId, TipoOperacion tipoOperacionId)
 		{
-			using var connection = new SqlConnection(connectionString);
+			using var connection = new MySqlConnection(connectionString);
 			return await connection.QueryAsync<Categoria>
 				(@"
 				SELECT * FROM Categorias
 				WHERE UsuarioId = @UsuarioId AND TipoOperacionId = @TipoOperacionId",
-				new {usuarioId, tipoOperacionId});
+				new { usuarioId, tipoOperacionId });
 		}
 
 		public async Task<Categoria> ObtenerCategoriaPorId(int id, int usuarioId)
 		{
-			using var connection = new SqlConnection(connectionString);
+			using var connection = new MySqlConnection(connectionString);
 			return await connection.QueryFirstOrDefaultAsync<Categoria>
 				(@"
 				SELECT * FROM Categorias
 				WHERE id = @id AND UsuarioId = @UsuarioId",
-				new {id, usuarioId});
+				new { id, usuarioId });
 		}
 
 		public async Task Actualizar(Categoria categoria)
 		{
-			using var connection = new SqlConnection(connectionString);
+			using var connection = new MySqlConnection(connectionString);
 			await connection.ExecuteAsync
 				(@"
 				UPDATE Categorias
@@ -95,13 +95,13 @@ namespace ManejoPresupuesto.Services
 
 		public async Task Borrar(int id)
 		{
-			using var connection = new SqlConnection(connectionString);
+			using var connection = new MySqlConnection(connectionString);
 			await connection.ExecuteAsync
 				(@"
-				DELETE Categorias
-				WHERE id = @id",
-				new {id});
+				DELETE FROM Categorias
+				WHERE Id = @id",
+				new { id });
 		}
 
-    }
+	}
 }

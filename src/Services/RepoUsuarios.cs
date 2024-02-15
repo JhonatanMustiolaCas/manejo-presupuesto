@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using ManejoPresupuesto.Models;
 using Microsoft.Data.SqlClient;
+using MySql.Data.MySqlClient;
 
 namespace ManejoPresupuesto.Services
 {
@@ -12,23 +13,23 @@ namespace ManejoPresupuesto.Services
 	public class RepoUsuarios : IRepoUsuarios
 	{
 		private readonly string connectionString;
-        public RepoUsuarios(IConfiguration configuration)
-        {
+		public RepoUsuarios(IConfiguration configuration)
+		{
 			this.connectionString = configuration.GetConnectionString("DefaultConnection");
-        }
+		}
 
 		public async Task<int> CrearUsuario(Usuario usuario)
 		{
-			using var connection = new SqlConnection(connectionString);
+			using var connection = new MySqlConnection(connectionString);
 			var usuarioId = await connection.QuerySingleAsync<int>
 				(@"
 				INSERT INTO Usuarios (Email, EmailNormalizado, PasswordHash)
 				VALUES (@Email, @EmailNormalizado, @PasswordHash);
-				SELECT SCOPE_IDENTITY()",
+				SELECT LAST_INSERT_ID()",
 				usuario);
 
 			await connection.ExecuteAsync
-				("CrearDataUsuarioNuevo", new { usuarioId }, commandType: System.Data.CommandType.StoredProcedure);
+				("CrearDatosUsuarioNuevo", new { _UsuarioId = usuarioId }, commandType: System.Data.CommandType.StoredProcedure);
 
 
 			return usuarioId;
@@ -36,9 +37,9 @@ namespace ManejoPresupuesto.Services
 
 		public async Task<Usuario> BuscarUsuarioPorEmail(string emailNormalizado)
 		{
-			using var connection = new SqlConnection(connectionString);
+			using var connection = new MySqlConnection(connectionString);
 			return await connection.QuerySingleOrDefaultAsync<Usuario>
-				("SELECT * FROM Usuarios WHERE EmailNormalizado = @emailNormalizado", new {emailNormalizado});
+				("SELECT * FROM Usuarios WHERE EmailNormalizado = @emailNormalizado", new { emailNormalizado });
 		}
-    }
+	}
 }
