@@ -29,8 +29,8 @@ AUTO_INCREMENT = 3
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
-INSERT INTO `DB_MANEJO_PRESUPUESTO`.`TiposOperaciones` (Descripcion)
-VALUES ("Ingreso"), ("Gastos");
+INSERT INTO `DB_MANEJO_PRESUPUESTO`.`TiposOperaciones` (Id, Descripcion)
+VALUES (1, "Ingreso"), (2, "Gastos");
 
 
 -- -----------------------------------------------------
